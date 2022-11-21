@@ -1,2 +1,5 @@
 *.DS_STORE
+*.pyc
 datasets/
+logs/
+lib/fillers/__pycache__/filler.cpython-38.pyc
