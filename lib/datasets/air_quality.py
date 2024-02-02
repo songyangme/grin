@@ -5,7 +5,9 @@ import pandas as pd
 
 from lib import datasets_path
 
-from ..utils.utils import compute_mean, disjoint_months, geographical_distance, infer_mask, thresholded_gaussian_kernel
+from ..utils.utils import (compute_mean, disjoint_months,
+                           geographical_distance, infer_mask,
+                           thresholded_gaussian_kernel)
 from .pd_dataset import PandasDataset
 
 
@@ -47,9 +49,19 @@ class AirQuality(PandasDataset):
         eval_mask = eval_mask.values.astype("uint8")
 
         # ===========================Superresolution====================================
-        # 0,(1,2,3,4),5,(6,7,8,9),10,...
+        # 0,(1,2,3,4),5,(6,7,8,9),10,... eval_mask中类似(1,2,3,4)的位置为1, (0,5)的位置为0
+        
+        # Make sure pos (1,2,3,4) are 1 and pos (0,5) are 0.
         eval_mask = np.zeros(eval_mask.shape)
         eval_mask[:, 0::5] = 1
+        where_0 = np.where(eval_mask == 0)
+        where_1 = np.where(eval_mask == 1)
+        eval_mask[where_0] = 1
+        eval_mask[where_1] = 0
+        
+        # Make sure first 80% are all 0 since it is training set
+        # num_t, num_n = eval_mask.shape
+        # eval_mask[:int(0.8*num_t),:] = 0
         eval_mask = eval_mask.astype("uint8")
 
         # ==============================================================================
